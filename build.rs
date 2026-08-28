@@ -15,7 +15,9 @@ fn replace_once(source: &mut String, from: &str, to: &str, label: &str) {
 
 fn apply_locked_server_policy() {
     let path = Path::new("src/config.rs");
-    let mut source = fs::read_to_string(path).expect("Failed to read src/config.rs");
+    let source_on_disk = fs::read_to_string(path).expect("Failed to read src/config.rs");
+    let uses_crlf = source_on_disk.contains("\r\n");
+    let mut source = source_on_disk.replace("\r\n", "\n");
     let original = source.clone();
 
     replace_once(
@@ -262,7 +264,12 @@ fn apply_locked_server_policy() {
     );
 
     if source != original {
-        fs::write(path, source).expect("Failed to apply locked RustDesk server policy");
+        let output = if uses_crlf {
+            source.replace('\n', "\r\n")
+        } else {
+            source
+        };
+        fs::write(path, output).expect("Failed to apply locked RustDesk server policy");
     }
 }
 
