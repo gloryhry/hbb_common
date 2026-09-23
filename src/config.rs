@@ -114,8 +114,8 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["rs.985100.xyz"];
+pub const RS_PUB_KEY: &str = "NRreBJgKPViMXm1vWbQsz33RlrtjT6RfbYUZotU6Cw0=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
@@ -2872,6 +2872,11 @@ pub mod keys {
     pub const OPTION_TRACKPAD_SPEED: &str = "trackpad-speed";
     pub const OPTION_REGISTER_DEVICE: &str = "register-device";
     pub const OPTION_RELAY_SERVER: &str = "relay-server";
+    pub const OPTION_CUSTOM_RENDEZVOUS_SERVER: &str = "custom-rendezvous-server";
+    pub const OPTION_API_SERVER: &str = "api-server";
+    pub const OPTION_KEY: &str = "key";
+    pub const OPTION_HIDE_SERVER_SETTINGS: &str = "hide-server-settings";
+    pub const OPTION_ALLOW_DEEP_LINK_SERVER_SETTINGS: &str = "allow-deep-link-server-settings";
     pub const OPTION_ICE_SERVERS: &str = "ice-servers";
     pub const OPTION_ALLOW_INSECURE_TLS_FALLBACK: &str = "allow-insecure-tls-fallback";
     pub const OPTION_ALLOW_WEBRTC_CC: &str = "allow-webrtc-congestion-control";
@@ -2939,6 +2944,14 @@ impl Status {
 #[cfg(test)]
 mod tests {
     use super::{permanent_password::PERMANENT_PASSWORD_ENC_VERSION, *};
+
+    #[test]
+    fn locked_server_options_are_visible_through_config_api() {
+        let server_key = keys::OPTION_CUSTOM_RENDEZVOUS_SERVER;
+        assert_eq!(Config::get_option(server_key), RENDEZVOUS_SERVERS[0]);
+        assert_eq!(Config::get_option(keys::OPTION_API_SERVER), "");
+        assert_eq!(Config::get_option(keys::OPTION_KEY), RS_PUB_KEY);
+    }
 
     static CONFIG_STATE_TEST_LOCK: Mutex<()> = Mutex::new(());
 
