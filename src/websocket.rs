@@ -469,7 +469,13 @@ mod tests {
 
     #[test]
     fn test_check_ws() {
-        let options = Config::get_options();
+        struct RestoreOptions(std::collections::HashMap<String, String>);
+        impl Drop for RestoreOptions {
+            fn drop(&mut self) {
+                Config::set_options(std::mem::take(&mut self.0));
+            }
+        }
+        let _restore = RestoreOptions(Config::get_options());
         // enable websocket
         Config::set_option(keys::OPTION_ALLOW_WEBSOCKET.to_string(), "Y".to_string());
 
@@ -501,6 +507,18 @@ mod tests {
             check_ws("[0:0:0:0:0:0:0:1]:21117"),
             "ws://[0:0:0:0:0:0:0:1]:21119"
         );
+        // The fork's locked server policy rejects the API and relay overrides above.
+        if !Config::get_option("custom-rendezvous-server").is_empty() {
+            assert_eq!(
+                Config::get_option("custom-rendezvous-server"),
+                crate::config::RENDEZVOUS_SERVERS[0]
+            );
+            assert_eq!(Config::get_option("api-server"), "");
+            assert_eq!(check_ws("rustdesk.com:21115"), "ws://rustdesk.com/ws/id");
+            assert_eq!(check_ws("rustdesk.com:21116"), "ws://rustdesk.com/ws/id");
+            assert_eq!(check_ws("rustdesk.com:21117"), "ws://rustdesk.com/ws/relay");
+            return;
+        }
         assert_eq!(check_ws("rustdesk.com:21115"), "wss://rustdesk.com/ws/id");
         assert_eq!(check_ws("rustdesk.com:21116"), "wss://rustdesk.com/ws/id");
         assert_eq!(
@@ -598,7 +616,6 @@ mod tests {
         assert_eq!(check_ws("127.0.0.1:23455"), "ws://127.0.0.1:23458");
         assert_eq!(check_ws("127.0.0.1:23456"), "ws://127.0.0.1:23458");
         assert_eq!(check_ws("127.0.0.1:34567"), "ws://127.0.0.1:34569");
-        Config::set_options(options);
     }
     // A server-to-client frame is unmasked, so it can be put on the wire by hand: the header alone,
     // which is all it takes to ask tungstenite for the allocation, or with its payload. `head` is
