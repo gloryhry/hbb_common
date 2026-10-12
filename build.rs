@@ -173,7 +173,7 @@ fn apply_locked_server_policy() {
         } else if k == keys::OPTION_RELAY_SERVER {
             Some(server())
         } else if k == keys::OPTION_API_SERVER {
-            Some(String::new())
+            Some(API_SERVER.to_owned())
         } else if k == keys::OPTION_KEY {
             Some(RS_PUB_KEY.to_owned())
         } else {

@@ -116,6 +116,8 @@ const CHARS: &[char] = &[
 
 pub const RENDEZVOUS_SERVERS: &[&str] = &["rs.985100.xyz"];
 pub const RS_PUB_KEY: &str = "NRreBJgKPViMXm1vWbQsz33RlrtjT6RfbYUZotU6Cw0=";
+/// HTTPS API endpoint pinned for the custom RustDesk client.
+pub const API_SERVER: &str = "https://rustdesk.glorycn.cn";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
@@ -2949,7 +2951,7 @@ mod tests {
     fn locked_server_options_are_visible_through_config_api() {
         let server_key = keys::OPTION_CUSTOM_RENDEZVOUS_SERVER;
         assert_eq!(Config::get_option(server_key), RENDEZVOUS_SERVERS[0]);
-        assert_eq!(Config::get_option(keys::OPTION_API_SERVER), "");
+        assert_eq!(Config::get_option(keys::OPTION_API_SERVER), API_SERVER);
         assert_eq!(Config::get_option(keys::OPTION_KEY), RS_PUB_KEY);
     }
 
