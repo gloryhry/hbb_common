@@ -307,8 +307,8 @@ async fn websocket_proxy_connections() {
     for (scheme, url, tls_type, auth, configured) in [
         (
             "http",
-            "ws://websocket-target.invalid/ws/id",
-            TlsType::Plain,
+            "wss://websocket-target.invalid/ws/id",
+            TlsType::Rustls,
             false,
             true,
         ),
